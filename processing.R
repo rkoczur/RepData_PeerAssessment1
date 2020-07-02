@@ -1,3 +1,6 @@
+library(chron)
+library(ggplot2)
+
 #Load the data
 unzip("activity.zip")
 myData <- read.csv("activity.csv")
@@ -39,7 +42,6 @@ for (i in 1:nrow(myData2)) {
         }
 }
 
-
 #New histogram after missing values replaced
 byDay2 <- tapply(myData2$step,myData2$date,sum, na.rm=TRUE)
 hist(byDay2, 
@@ -48,5 +50,17 @@ hist(byDay2,
      ylab="Number of days", 
      col="lightcyan2")
 
+#Mean and median
+meanByDay2 <- mean(byDay2)
+medianByDay2 <- median(byDay2)
 
+#Impute type of day
+myData2$weekend <- is.weekend(as.Date(myData2$date))
+myData2$weekend <- factor(as.numeric(myData2$weekend), labels=c("weekday", "weekend"), levels=c(0,1))
 
+#Get averaged by factors
+AvgByInt2 <- aggregate(steps ~ interval + weekend, myData2, mean)
+
+ggplot(AvgByInt2, aes(interval,steps))+
+        geom_line(col="blue")+
+        facet_grid(weekend~.)
