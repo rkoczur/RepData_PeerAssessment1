@@ -24,3 +24,29 @@ plot(names(AvgByInt), AvgByInt,
      main ="Average steps taken througout a day",
      xlab = "Time intervals",
      ylab = "Steps taken")
+
+#Most steps
+maxByInt <- AvgByInt[which.max(AvgByInt)]
+
+#Missing values
+missSteps <- sum(is.na(myData$steps))
+
+#Replace missing values with interval average
+myData2 <- myData
+for (i in 1:nrow(myData2)) {
+        if (is.na(myData2[i,1])) {
+                myData2[i,1] <- as.numeric(AvgByInt[names(AvgByInt)==myData2[i,3]])
+        }
+}
+
+
+#New histogram after missing values replaced
+byDay2 <- tapply(myData2$step,myData2$date,sum, na.rm=TRUE)
+hist(byDay2, 
+     main="Histogram of steps taken in a day (NA replaced)", 
+     xlab = "Steps taken", 
+     ylab="Number of days", 
+     col="lightcyan2")
+
+
+
