@@ -5,16 +5,26 @@ output:
     keep_md: true
 author: "Richard Koczur"
 ---
-```{r setup}
+
+```r
   library(knitr)
   opts_chunk$set(fig.path = "./figures/") # corrected path and added dev
 ```
 
 ## Loading and preprocessing the data
-```{r}
+
+```r
 library(ggplot2)
 library(chron)
+```
 
+```
+## NOTE: The default cutoff when expanding a 2-digit year
+## to a 4-digit year will change from 30 to 69 by Aug 2020
+## (as for Date and POSIXct in base R.)
+```
+
+```r
 unzip("activity.zip")
 myData <- read.csv("activity.csv")
 ```
@@ -22,7 +32,8 @@ myData <- read.csv("activity.csv")
 ---
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 byDay <- tapply(myData$step,myData$date,sum, na.rm=TRUE)
 
 meanByDay <- mean(byDay)
@@ -35,13 +46,16 @@ hist(byDay,
      col="pink",
      border="red",)
 ```
+
+![](./figures/unnamed-chunk-2-1.png)<!-- -->
   
-### The mean is **`r meanByDay`** and the median is **`r medianByDay`**
+### The mean is **9354.2295082** and the median is **10395**
 
 ---
 
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 AvgByInt <- tapply(myData$step,as.factor(myData$interval),mean, na.rm=TRUE)
 plot(names(AvgByInt), AvgByInt, 
      type="l",
@@ -50,18 +64,23 @@ plot(names(AvgByInt), AvgByInt,
      main ="Average steps taken througout a day",
      xlab = "Time intervals",
      ylab = "Steps taken")
+```
 
+![](./figures/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 #Most steps
 maxByInt <- AvgByInt[which.max(AvgByInt)]
 ```
   
-### Most steps (`r as.numeric(maxByInt)`) taken in the `r names(maxByInt)`. interval.
+### Most steps (206.1698113) taken in the 835. interval.
 
 ---
 
 ## Imputing missing values
 
-```{r}
+
+```r
 #Missing values
 missSteps <- sum(is.na(myData$steps))
 
@@ -74,9 +93,10 @@ for (i in 1:nrow(myData2)) {
 }
 ```
 
-### There were **`r missSteps`** missing values, which have been replaced by the interval averages.
+### There were **2304** missing values, which have been replaced by the interval averages.
 
-```{r}
+
+```r
 byDay2 <- tapply(myData2$step,myData2$date,sum, na.rm=TRUE)
 
 #Mean and median
@@ -91,7 +111,9 @@ hist(byDay2,
      col="lightcyan2")
 ```
 
-### The mean now is **`r as.integer(meanByDay2)`** and the median is **`r as.integer(medianByDay2)`**
+![](./figures/unnamed-chunk-5-1.png)<!-- -->
+
+### The mean now is **10766** and the median is **10766**
 
 **Imputing missing data was making the distribution of steps taken daily more like a normal distribution.**
 
@@ -99,7 +121,8 @@ hist(byDay2,
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 #Impute type of day
 myData2$weekend <- is.weekend(as.Date(myData2$date))
 myData2$weekend <- factor(as.numeric(myData2$weekend), labels=c("weekday", "weekend"), levels=c(0,1))
@@ -111,5 +134,7 @@ ggplot(AvgByInt2, aes(interval,steps))+
         geom_line(col="blue")+
         facet_grid(weekend~.)
 ```
+
+![](./figures/unnamed-chunk-6-1.png)<!-- -->
 
 
